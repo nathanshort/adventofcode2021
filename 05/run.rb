@@ -7,12 +7,12 @@ gridp2 = Hash.new( 0 )
 
 ARGF.each_line do |line|
     x1,y1,x2,y2 = line.scanf("%d,%d -> %d,%d")
-    xinc = x1 > x2 ? -1 : ( x1 == x2 ? 0 : 1 )
-    yinc = y1 > y2 ? -1 : ( y1 == y2 ? 0 : 1 )
+    part1 = ( x1 == x2 || y1 == y2 )
     distance = [ (x2-x1).abs, (y2-y1).abs ].max + 1
+    xinc, yinc = ( x2 <=> x1 ), ( y2 <=> y1 )
     distance.times do 
       point = "#{x1},#{y1}"
-      gridp1[point]+=1 if ( x1 == x2 || y1 == y2 ) 
+      gridp1[point]+=1 if part1
       gridp2[point]+=1
       x1 += xinc
       y1 += yinc 
