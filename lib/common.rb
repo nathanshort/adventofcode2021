@@ -173,6 +173,9 @@ class Grid
     if args[:io]
       args[:io].each_line.with_index do |line,y|
          line.chomp.chars.each_with_index do |c,x|
+         if block_given?
+           x,y,c = yield( x,y,c )
+         end
          @points[Point.new(x,y)] = c
          @width = (x+1) if @width < (x+1)
        end
