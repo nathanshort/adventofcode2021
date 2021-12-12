@@ -28,7 +28,7 @@ end
 can_visit1 = lambda{ |visited,c| !visited.key?(c) || visited[c] == 0 || c.upcase == c }
 all_paths1 = dfs( connections, 'start', 'end', can_visit1 )
                  
-can_visit2 = lambda{ |visited,c| can_visit1.call( visited, c) || ( c != 'start' && visited.count{|k,v| k.downcase == k && v > 1 } == 0 ) }
+can_visit2 = lambda{ |visited,c| can_visit1.call( visited, c) || ( c != 'start' && ! visited.any?{|k,v| v > 1 && k.downcase == k } ) }
 all_paths2 = dfs( connections, 'start', 'end', can_visit2 )
                  
 puts "part 1:#{all_paths1.count}"
