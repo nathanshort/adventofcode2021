@@ -30,7 +30,7 @@ can_visit1 = lambda{ |visited,c| !visited.key?(c) || visited[c] == 0 || c.upcase
 all_paths1 = dfs( connections, 'start', 'end', can_visit1 )
                  
 can_visit2 = lambda{ |visited,c| !visited.key?(c) || visited[c] == 0 || c.upcase == c || 
-                    ( ! ['start'].index(c) && visited.count{|k,v| k.downcase == k && v > 1 } == 0 ) }
+                    ( c != 'start' && visited.count{|k,v| k.downcase == k && v > 1 } == 0 ) }
 all_paths2 = dfs( connections, 'start', 'end', can_visit2 )
                  
 puts "part 1:#{all_paths1.count}"
