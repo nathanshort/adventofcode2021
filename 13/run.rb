@@ -12,11 +12,8 @@ instructions.split(/\n/).each_with_index do |i,index|
     axis,fold_point = i.scanf( "fold along %c=%d" )
     resulting_grid = Grid.new
     grid.each do |point,_|
-      x,y = point.x,point.y
-      point_to_fold = ( axis == 'y' ? y : x )
-      point_to_fold = fold_point - ( point_to_fold - fold_point ).abs 
-      y = ( axis == 'y' ? point_to_fold : y )
-      x = ( axis == 'x' ? point_to_fold : x )
+      y = axis == 'y' ? ( fold_point - ( point.y - fold_point ).abs ) : point.y
+      x = axis == 'x' ? ( fold_point - ( point.x - fold_point ).abs ) : point.x
       resulting_grid[Point.new(x,y)] = '#'
     end
     grid = resulting_grid
