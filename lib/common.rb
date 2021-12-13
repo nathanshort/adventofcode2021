@@ -247,7 +247,7 @@ class Grid
   def show
    (0..(height - 1) ).each do |y|
      (0..(width - 1) ).each do |x| 
-       print @points[Point.new(x,y)]
+       print @points[Point.new(x,y)] || " "
      end
      print "\n"
    end
