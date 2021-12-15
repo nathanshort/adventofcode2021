@@ -3,8 +3,8 @@ def score( pair2counts, template )
     by_char = Hash.new(0)
     pair2counts.each { |pair,count| by_char[pair[0]] += count }
     
-    # fencepost - we never counted the last char in the template
-    # luckily, it will always be the same
+    # fencepost - we never counted the last char in the template.
+    # it will always be the same
     by_char[template.chars.last] += 1
     by_char.values.max - by_char.values.min
 end
@@ -28,8 +28,8 @@ pair2counts = Hash.new(0)
   new_pair2counts = Hash.new(0)
   pair2counts.each do |pair,count|
     insert = instructions[pair]
-    new_pair2counts["#{pair[0]}#{insert}"] += count
-    new_pair2counts["#{insert}#{pair[1]}"] += count
+    new_pair2counts[ pair[0] + insert ] += count
+    new_pair2counts[ insert + pair[1] ] += count
   end
   pair2counts = new_pair2counts
   puts "part 1:#{score(pair2counts,template) }" if iter == 9
