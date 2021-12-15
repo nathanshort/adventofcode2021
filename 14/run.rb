@@ -6,8 +6,7 @@ def score( pair2counts, template )
     # fencepost - we never counted the last char in the template
     # luckily, it will always be the same
     by_char[template.chars.last] += 1
-    sorted = by_char.values.sort
-    sorted[sorted.length-1] - sorted[0]
+    by_char.values.max - by_char.values.min
 end
 
 template, inst = ARGF.read.split(/\n\n/)
