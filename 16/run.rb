@@ -1,9 +1,11 @@
-
+# slice a binary string and return the decimal value
+def to_d(p,a,b)
+  p[a,b].to_i(2)
+end
 
 def run(packet)
-
-  version = packet[0,3].to_i(2)
-  type = packet[3,3].to_i(2)
+  version = to_d( packet,0,3 )
+  type = to_d( packet,3,3 )
   value = 0
   current = 6
 
@@ -18,10 +20,10 @@ def run(packet)
     value = data.to_i(2)
   else # operator
     values = []
-    length = packet[6,1].to_i(2)
+    length = to_d( packet,6,1 )
 
     if length == 0
-      sub_packet_length = packet[7,15].to_i(2)
+      sub_packet_length = to_d( packet,7,15 )
       current = 7+15
       target = current + sub_packet_length
       while current < target 
@@ -31,7 +33,7 @@ def run(packet)
         version += result[:version]
       end
     else
-      sub_packet_count = packet[7,11].to_i(2)
+      sub_packet_count = to_d( packet,7,11 )
       current = 7+11
       sub_packet_count.times do
         result = run(packet[current..])
