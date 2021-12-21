@@ -88,6 +88,9 @@ class Point
     ]
    end
 
+  def to_s
+    "(#{@x},#{y})"
+  end
 end
 
 
@@ -154,7 +157,7 @@ end
 class Grid
 
   include Enumerable 
-  attr_accessor :height, :width, :points
+  attr_accessor :points, :xmin, :ymin, :xmax, :ymax
 
   def []( point )
     @points[point]
@@ -162,13 +165,22 @@ class Grid
 
   def []=(point,value)
     @points[point] = value
-    @height = point.y+1 if point.y+1 > @height
-    @width = point.x+1 if point.x+1 > @width 
+    if point.y > ymax
+      @ymax = point.y
+    elsif point.y < ymin
+      @ymin = point.y
+    end
+
+    if point.x > xmax
+      @xmax = point.x
+    elsif point.x < xmin
+      @xmin = point.x
+    end
   end
 
   def initialize( args = {} ) 
     @points = {}
-    @width, @height = 0, 0
+    @xmin, @ymin, @xmax, @ymax = 0,0,0,0
 
     if args[:io]
       args[:io].each_line.with_index do |line,y|
@@ -177,76 +189,28 @@ class Grid
            x,y,c = yield( x,y,c )
          end
          @points[Point.new(x,y)] = c
-         @width = (x+1) if @width < (x+1)
+         @xmax = x if @xmax < x
        end
-       @height = (y+1) if @height < (y+1)
+       @ymax = y
      end
     end
    end
-  
+
+  def height
+    @ymax - @ymin + 1
+  end
+
+  def width
+    @xmax - @xmin + 1
+  end
+
   def initialize_copy( original )
    @points = original.points.dup
   end
 
-  # returns a new grid rotated 90deg clockwise.  current grid is untouched
-  def rotate
-    g = Grid.new
-    self.each do |point,v|
-      g[Point.new(point.y,point.x)] = v
-    end
-    (0..g.height - 1).each do |y|
-      ( 0..g.width/2.ceil - 1 ).each do |x|
-        tmp = g[Point.new(x,y)]
-        g[Point.new(x,y)] = g[Point.new(g.width - x - 1, y )]
-        g[Point.new(g.width - x - 1,y)] = tmp
-      end
-    end
-    g
-  end
-
-  # flip around the horizontal center row.  returns a new grid
-  def hflip
-    g = Grid.new
-    self.each do |point,v|
-      g[Point.new( @width - point.x - 1, point.y )] = v 
-    end
-    g
-  end
-
-  # flip around the vertical center row.  returns a new grid
-  def vflip
-    g = Grid.new
-    self.each do |point,v|
-      g[Point.new( point.x, @height - point.y - 1 )] = v 
-    end
-    g
-  end
-
-  # returns edges as array of array of points.  edges are 
-  # returned starting at the top, in clockwise order
-  def edges
-    h = hedges
-    v = vedges
-    [ h[0], v[1], h[1], v[0] ]
-  end
-
-  # vertical edges
-  def vedges
-    [0,@width-1].map do |x|
-      ( 0..@height-1 ).map{ |y| @points[Point.new(x,y)] }
-    end
-  end
-
-  # horizontal edges
-  def hedges
-    [0,@height-1].map do |y|
-      ( 0..@width-1 ).map{ |x| @points[Point.new(x,y)] }
-    end
-  end
-
   def show
-   (0..(height - 1) ).each do |y|
-     (0..(width - 1) ).each do |x| 
+   (@ymin..@ymax).each do |y|
+     (@xmin..@xmax).each do |x| 
        print @points[Point.new(x,y)] || " "
      end
      print "\n"
@@ -255,11 +219,24 @@ class Grid
   end
 
   def each( &block )
-    points.keys.sort.each do |k|
-      block.call( k, points[k] )
+    if block_given?
+      points.keys.sort.each do |k|
+        block.call( k, points[k] )
+      end
+    else
+      to_enum(:each)
     end
   end
-  
+
+  def outside_points( negx, posx, negy, posy, &block )
+    ( @ymin - negy .. ( @ymax + posy ) ).each do |y|
+      ( @xmin - negx .. ( @xmax + posx ) ).each do |x|
+        if x < @xmin || x > @xmax || y < @ymin || y > @ymax
+          block.call( Point.new(x,y) )
+        end
+      end
+    end
+  end
 
   def ==( other )
     other.points == @points
